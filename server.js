@@ -4,25 +4,30 @@ const app = express();
 const fs = require('fs');
 const bodyParser = require('body-parser');
 
-let data;
 
 //Settings
 const port = 3000;
-const dir = 'C:/Users/knote/Desktop/weather/'
+const dataFolder = 'C:/Users/knote/Desktop/weather/data/';
+
+
+let data;
+let tenMin;
+let logLine = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation},${data.battery}\r\n`;
 
 //CSV data logger
-function logData(where) {
-  
-    var FILE = `${where}/weather-${data.time.slice(0, 10)}.csv`;
-    
-    const line = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation},${data.battery}\r\n`;
-    
+function logData(what, where) {
     try {
-      fs.appendFileSync( FILE, line);
+      fs.appendFileSync( where, what);
     } catch (err) {
       console.error(err);
     };
 };
+
+function CHMU() {
+    tenMin.concat(data);
+    //check the time
+    //do nothing or calculate, save and reset values
+}
 
 //This defines how to interpret incoming data
 app.use(bodyParser.text())
@@ -49,9 +54,9 @@ app.put('/data', (req, res) => {
     const time = new Date().toISOString();
     data = {time,temperature,pressure,humidity,windDirection,windSpeed,radioactivity,battery};
     
-    logData(dir + 'data/');
+    logData(logLine, dataFolder + `/weather-${data.time.slice(0, 10)}.csv`);
     
-    console.log(time + ' - Received data')
+    console.log(time + ' - Received data');
     res.send(req.statusMessage);
 });
 
