@@ -2,41 +2,33 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
-const bodyParser = require('body-parser');
-
 
 //Settings
 const port = 3000;
-const dataFolder = 'C:/Users/knote/Desktop/weather/data/';
+const dir = 'C:/Users/knote/Desktop/weather/';
 
 
-let data;
-let tenMin;
-let logLine = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation},${data.battery}\r\n`;
-
-//CSV data logger
-function logData(what, where) {
+function logData(data, PATH) {
+  
+    var FILE = `${PATH}/weather-${data.time.slice(0, 10)}.csv`;
+    
+    const line = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation}\r\n`;
+    
     try {
-      fs.appendFileSync( where, what);
+      fs.appendFileSync( FILE, line);
     } catch (err) {
       console.error(err);
     };
 };
 
-function CHMU() {
-    tenMin.concat(data);
-    //check the time
-    //do nothing or calculate, save and reset values
-}
-
-//This defines how to interpret incoming data
-app.use(bodyParser.text())
+//This is here for the receiver to see req.body
+app.use(express.json());
 
 //Get request for the main page
 app.get('/', (req, res) => {
-    console.log(`${req.method} ${req.path} HTTP/${req.httpVersion}`);
+    console.log(`${req.method} ${req.object} HTTP/${req.httpVersion}`);
 
-    res.sendFile( 'index.html', { root : __dirname});
+    res.sendFile( dir + '/index.html');
 });
 
 //Json file request
@@ -50,13 +42,12 @@ app.get('/data', (req, res) => {
 app.put('/data', (req, res) => {
     console.log(`${req.method} ${req.path} HTTP/${req.httpVersion}`);
     
-    const [battery,temperature,pressure,humidity,windDirection,windSpeed,radioactivity] = req.body.split(',');
-    const time = new Date().toISOString();
-    data = {time,temperature,pressure,humidity,windDirection,windSpeed,radioactivity,battery};
-    
-    logData(logLine, dataFolder + `/weather-${data.time.slice(0, 10)}.csv`);
-    
-    console.log(time + ' - Received data');
+    data = req.body;
+    data.time = new Date().toISOString();
+
+    console.log(`Rceived data ${data.time.replace('T' ,' ').slice(0,-5)}`);
+
+    logData(data, dir + 'data/')
     res.send(req.statusMessage);
 });
 
