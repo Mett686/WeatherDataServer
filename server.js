@@ -5,13 +5,10 @@ const fs = require('fs');
 
 //Settings
 const port = 3000;
-const dir = 'C:/Users/knote/Desktop/weather/';
-
 
 function logData(data, PATH) {
-  
-    var FILE = `${PATH}/weather-${data.time.slice(0, 10)}.csv`;
-    
+
+    var FILE = `${PATH}/weather-${data.time.slice(0, 7)}.csv`;
     const line = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation}\r\n`;
     
     try {
@@ -28,7 +25,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
     console.log(`${req.method} ${req.object} HTTP/${req.httpVersion}`);
 
-    res.sendFile( dir + '/index.html');
+    res.sendFile(__dirname + 'index.html');
 });
 
 //Json file request
@@ -45,9 +42,10 @@ app.put('/data', (req, res) => {
     data = req.body;
     data.time = new Date().toISOString();
 
-    console.log(`Rceived data ${data.time.replace('T' ,' ').slice(0,-5)}`);
+    console.log(`Received data ${data.time.replace('T' ,' ').slice(0,-5)}`);
+    logData(data, __dirname + '/data')
+    //console.log(data.toString())
 
-    logData(data, dir + 'data/')
     res.send(req.statusMessage);
 });
 
