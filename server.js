@@ -5,6 +5,7 @@ const fs = require('fs');
 //Settings
 const PORT = 3000;
 const DIR = __dirname;
+
 //-----spaghetti-beyond-------
 
 function logData(data) {
