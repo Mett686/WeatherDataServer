@@ -9,7 +9,7 @@ const DIR = __dirname;
 //-----spaghetti-beyond-------
 
 function logData(data) {
-    var FILE = DIR + `/data/${data.time.slice(0, 7)}.csv`;
+    var FILE = DIR + `/weather-data/${data.time.slice(0, 7)}.csv`;
     const line = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation}\r\n`;
     
     try {
