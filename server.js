@@ -33,7 +33,7 @@ app.get('/data', (req, res) => {
 
     res.json( data );
 });
-//finish this!!
+
 app.get('/array/:startTime/:stopTime', (req, res) => {
   const startTime = req.params.startTime;
   const stopTime = req.params.stopTime;
