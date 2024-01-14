@@ -2,7 +2,7 @@ const express = require('express')
 const app = express();
 const fs = require('fs');
 
-//Settings
+// Settings
 const PORT = 3000;
 const DIR = __dirname;
 
@@ -19,13 +19,13 @@ function logData(data) {
       };
 };
 
-//Express
+// Express
 app.use(express.json());
 
 app.get('/', (req, res) => {
     console.log(`${req.method} ${req.object} HTTP/${req.httpVersion}`);
-    //work in progress
-    res.sendFile(DIR + '/website/Home.html');
+    // work in progress
+    res.sendFile(DIR + '/index.html');
 });
 
 app.get('/data', (req, res) => {
