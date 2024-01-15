@@ -2,6 +2,7 @@ const express = require('express')
 const app = express();
 const fs = require('fs');
 
+
 // Settings
 const PORT = 3000;
 const DIR = __dirname;
@@ -9,7 +10,7 @@ const DIR = __dirname;
 //-----spaghetti-beyond-------
 
 function logData(data) {
-    var FILE = DIR + `/weather-data/${data.time.slice(0, 7)}.csv`;
+    var FILE = DIR + `/data/${data.time.slice(0, 7)}.csv`;
     const line = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation}\r\n`;
     
     try {
@@ -35,12 +36,12 @@ app.get('/data', (req, res) => {
 });
 
 app.get('/array/:startTime/:stopTime', (req, res) => {
-  const startTime = req.params.startTime;
-  const stopTime = req.params.stopTime;
+  const startTime = new Date(req.params.startTime);
+  const stopTime = new Date(req.params.stopTime);
 
-  const csvFile = `${(req.params.startTime).slice(0, 7)}.csv`
+  const csvFile = `${(req.params.startTime).slice(0, 7)}.csv`;
 
-  console.log('array request')
+  console.log('array request');
 
   try {
     const csv = fs.readFileSync(`${DIR}/data/${csvFile}`, { encoding: 'utf8' });
@@ -57,11 +58,9 @@ app.get('/array/:startTime/:stopTime', (req, res) => {
         const values = line.split(','); // Assuming values are separated by commas
         const timeValue = new Date(values[0]); // Assuming time is the first element in each row
 
-        const startTimeDate = new Date(startTime);
-        const stopTimeDate = new Date(stopTime);
-
-        return !isNaN(timeValue) && timeValue >= startTimeDate && timeValue <= stopTimeDate;
-      });
+        return !isNaN(timeValue) && timeValue >= startTime && timeValue <= stopTime;
+      })
+      .map(line => line.split(',').map(value => isNaN(value) ? value : parseFloat(value)));
 
     res.json(filteredCsvArray);
 
@@ -70,6 +69,7 @@ app.get('/array/:startTime/:stopTime', (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 app.put('/data', (req, res) => {
     console.log(`${req.method} ${req.path} HTTP/${req.httpVersion}`);
