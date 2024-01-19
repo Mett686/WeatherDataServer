@@ -8,26 +8,41 @@
         <script type="text/javascript">
             google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawChart);
-  
-        function drawChart() {
-          var data = google.visualization.arrayToDataTable([
-    ['Year', 'Sales', 'Expenses'],
-    ['2004',  1000,      400],
-    ['2005',  1170,      460],
-    ['2006',  660,       1120],
-    ['2007',  1030,      540]
-]);
-  
-          var options = {
-            title: 'Company Performance',
-            curveType: 'function',
-            legend: { position: 'bottom' }
-          };
-  
-          var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-  
-          chart.draw(data, options);
-        }
+        
+            let array; // Declare the variable outside the fetch block
+
+            fetch('http://localhost:3000/array/2024/2025')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle the JSON data
+                    console.log(data);
+                    array = data; // Assign data to the array variable here
+                    drawChart(); // Call drawChart after fetching and processing the data
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+
+            // Move the drawChart function definition here or make sure it's defined before calling drawChart
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(array);
+
+                var options = {
+                    title: 'Weather graph',
+                    curveType: 'function',
+                    legend: { position: 'bottom' }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+            chart.draw(data, options);
+}
       </script>
     </head>
     <body>
@@ -35,7 +50,7 @@
         <p>Hello and welcome to GZ weather API</p>
 
         <p>Try chenking out <a href="http://xxxxx/data">http://xxxxx/data</a></p>
-        <div id="curve_chart" style="width: 900px; height: 500px"></div>
+        <div id="curve_chart" style="width: 1200px; height: 600px"></div>
     </body>
   </html>
   

@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express();
+const cors = require('cors')
 const fs = require('fs');
 
 
@@ -10,8 +11,8 @@ const DIR = __dirname;
 //-----spaghetti-beyond-------
 
 function logData(data) {
-    var FILE = DIR + `/data/${data.time.slice(0, 7)}.csv`;
-    const line = `${data.time},${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation}\r\n`;
+    var FILE = DIR + `/data/${data.time.slice(0, 4)}.csv`;
+    const line = `${data.time.slice(0,-5)}Z,${data.temperature},${data.pressure},${data.humidity},${data.windSpeed},${data.windDirection},${data.radiation}\r\n`;
     
     try {
         fs.appendFileSync( FILE, line);
@@ -21,6 +22,7 @@ function logData(data) {
 };
 
 // Express
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -39,7 +41,7 @@ app.get('/array/:startTime/:stopTime', (req, res) => {
   const startTime = new Date(req.params.startTime);
   const stopTime = new Date(req.params.stopTime);
 
-  const csvFile = `${(req.params.startTime).slice(0, 7)}.csv`;
+  const csvFile = `${startTime.toISOString().slice(0, 4)}.csv`;
 
   console.log('array request');
 
@@ -75,7 +77,7 @@ app.put('/data', (req, res) => {
     console.log(`${req.method} ${req.path} HTTP/${req.httpVersion}`);
     
     data = req.body;
-    data.time = new Date().toISOString().slice(0,17);
+    data.time = new Date().toISOString();
 
     console.log(`Received data ${data.time.replace('T' ,' ').slice(0,-5)}`);
     logData(data)
