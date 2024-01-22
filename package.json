@@ -1,15 +1,17 @@
 {
   "name": "weatherdataserver",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node ./server.js"
+    "test": "node ./server.js",
+    "start": "node server.js"
   },
   "author": "Mett",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }
