@@ -77,10 +77,10 @@ function dataWrite() {
 
   const degrees = Math.atan2(dataAverage.windDirection.sin, dataAverage.windDirection.cos) * (180 / Math.PI);
   dataAverage.windDirection.degrees = (( degrees + 360 ) % 360).toFixed(decimal.windDirection);
-
-  dataString = `${(new Date()).toISOString()}, ${dataAverage.temperature}, ${dataAverage.pressure}, ${dataAverage.humidity}, ${dataAverage.windSpeed}, ${dataAverage.windDirection.degrees}, ${dataAverage.radiation}\r\n`
-
+  
   // Now the program tries to write the averages to a file
+  dataString = `${(new Date()).toISOString()},${dataAverage.temperature},${dataAverage.pressure},${dataAverage.humidity},${dataAverage.windSpeed},${dataAverage.windDirection.degrees},${dataAverage.radiation}\r\n`
+
   try {
     fs.appendFileSync(dataPath + new Date().toISOString().slice(0, 4) + '.csv', dataString);
     dataString = '';
