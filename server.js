@@ -68,26 +68,36 @@ function dataWrite() {
   const degrees = Math.atan2(dataAverage.windDirection.sin, dataAverage.windDirection.cos) * (180 / Math.PI);
   dataAverage.windDirection.degrees = ( degrees + 360 ) % 360;
 
-  dataString = `${new Date().toISOString().slice(0,13)}, ${dataAverage.temperature}, ${dataAverage.pressure}, ${dataAverage.humidity}, ${dataAverage.windSpeed}, ${dataAverage.windDirection.degrees}, ${dataAverage.radiation}\r\n`
+  dataString = `${(new Date()).toISOString()}, ${dataAverage.temperature}, ${dataAverage.pressure}, ${dataAverage.humidity}, ${dataAverage.windSpeed}, ${dataAverage.windDirection.degrees}, ${dataAverage.radiation}\r\n`
 
   try {
-      fs.appendFileSync(dataPath + new Date().toISOString().slice(0, 4) + '.csv', dataString);
-      dataString = '';
-      console.log(`${new Date().toISOString().replace('T', ' ').slice(0,-1)} Written data`);
+    fs.appendFileSync(dataPath + new Date().toISOString().slice(0, 4) + '.csv', dataString);
+    dataString = '';
+    dataSum = {
+      temperature: 0,
+      pressure: 0,
+      humidity: 0,
+      windSpeed: 0,
+      radiation: 0,
+      windDirection: {
+          sin: 0,
+          cos: 0
+      }}
   } catch (err) {
       console.error(err);
   }
+  console.log(new Date().toISOString() + ' Written data');
 }
 
 function calculateNextWriteTime() {
   const now = new Date();
   const minutes = now.getMinutes();
-  const nextWriteMinutes = Math.ceil(minutes / 10) * 10 + 10; // This rounds up to nearest 10 minutes and adds 10, otherwise it would spam if the nearest ten minutes are now
+  let nextWriteMinutes = Math.ceil(minutes / 10) * 10 + 10; // This rounds up to nearest 10 minutes and adds 10, otherwise it would spam if the nearest ten minutes are now
   
   if (minutes >= 50) {
     nextWriteMinutes = 60;
   }
-  
+
   const nextWriteTime = new Date(now);
   nextWriteTime.setMinutes(nextWriteMinutes, 0, 0);
 
@@ -132,7 +142,7 @@ app.get('/array/:startTime/:stopTime', (req, res) => { //Technically useless now
   const stopTime = new Date(req.params.stopTime);
 
   const csvFile = `${startTime.toISOString().slice(0, 4)}.csv`;
-  console.log(`${new Date().toISOString().replace('T' ,' ').slice(0,-1)} Received array request`);
+  console.log(`${new Date().toISOString()} Received array request`);
 
   try {
     const csv = fs.readFileSync( dataPath + csvFile , { encoding: 'utf8' });
@@ -175,7 +185,6 @@ app.put('/data', (req, res) => {
 });
 
 // This starts the app
-console.log(`${new Date().toISOString().replace('T', ' ').slice(0,-1)} Written data`)
 scheduleNextWrite();
 
 app.listen(PORT, () => {
