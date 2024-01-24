@@ -132,7 +132,6 @@ app.get('/array/:startTime/:stopTime', (req, res) => { //Technically useless now
   const stopTime = new Date(req.params.stopTime);
 
   const csvFile = `${startTime.toISOString().slice(0, 4)}.csv`;
-
   console.log(`${new Date().toISOString().replace('T' ,' ').slice(0,-1)} Received array request`);
 
   try {
