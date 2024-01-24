@@ -9,6 +9,15 @@ const PORT = 3000;
 const DIR = __dirname;
 var dataPath = DIR + '/data/';
 
+const decimal = { // This sets how many decimal places should be saved
+  temperature: 1,
+    pressure: 0,
+    humidity: 2,
+    windSpeed: 2,
+    windDirection: 0,
+    radiation: 2 
+}
+
 //-----spaghetti-beyond-------
 let logDataN = 0;
 let dataSum = {
@@ -33,11 +42,11 @@ function DegToRad(degrees) {
 
 function logData(data) {
   // Here we sum the data for dataWrite to average them
-  dataSum.temperature += data.temperature;
-  dataSum.pressure += data.pressure;
-  dataSum.humidity += data.humidity;
-  dataSum.windSpeed += data.windSpeed;
-  dataSum.radiation += data.radiation;
+  dataSum.temperature += parseFloat(data.temperature);
+  dataSum.pressure += parseInt(data.pressure);
+  dataSum.humidity += parseFloat(data.humidity);
+  dataSum.windSpeed += parseFloat(data.windSpeed);
+  dataSum.radiation += parseInt(data.radiation);
   dataSum.windDirection.sin += Math.sin(DegToRad(data.windDirection)) //This is here for the possibility that the windDirection values are around 0/360 which would result in 180 average, which is exactly opposite of the actual value
   dataSum.windDirection.cos += Math.cos(DegToRad(data.windDirection))
   logDataN +=1
@@ -56,20 +65,22 @@ function dataWrite() {
           cos: 0
   }}
 
-  // write the averaging algorithm
-  dataAverage.temperature = avg(dataSum.temperature);
-  dataAverage.pressure = avg(dataSum.pressure);
-  dataAverage.humidity = avg(dataSum.humidity);
-  dataAverage.windSpeed = avg(dataSum.windSpeed);
-  dataAverage.radiation = avg(dataSum.radiation);
+  dataAverage.temperature = avg(dataSum.temperature).toFixed(decimal.temperature);
+  dataAverage.pressure = avg(dataSum.pressure).toFixed(decimal.pressure);
+  dataAverage.humidity = avg(dataSum.humidity).toFixed(decimal.humidity);
+  dataAverage.windSpeed = avg(dataSum.windSpeed).toFixed(decimal.windSpeed);
+  dataAverage.radiation = avg(dataSum.radiation).toFixed(decimal.radiation);
+  
+  // This puts the windDirection back together
   dataAverage.windDirection.sin = avg(dataSum.windDirection.sin);
   dataAverage.windDirection.cos = avg(dataSum.windDirection.cos);
 
   const degrees = Math.atan2(dataAverage.windDirection.sin, dataAverage.windDirection.cos) * (180 / Math.PI);
-  dataAverage.windDirection.degrees = ( degrees + 360 ) % 360;
+  dataAverage.windDirection.degrees = (( degrees + 360 ) % 360).toFixed(decimal.windDirection);
 
   dataString = `${(new Date()).toISOString()}, ${dataAverage.temperature}, ${dataAverage.pressure}, ${dataAverage.humidity}, ${dataAverage.windSpeed}, ${dataAverage.windDirection.degrees}, ${dataAverage.radiation}\r\n`
 
+  // Now the program tries to write the averages to a file
   try {
     fs.appendFileSync(dataPath + new Date().toISOString().slice(0, 4) + '.csv', dataString);
     dataString = '';
@@ -83,6 +94,7 @@ function dataWrite() {
           sin: 0,
           cos: 0
       }}
+    logDataN = 0
   } catch (err) {
       console.error(err);
   }
@@ -94,7 +106,7 @@ function calculateNextWriteTime() {
   const minutes = now.getMinutes();
   let nextWriteMinutes = Math.ceil(minutes / 10) * 10 + 10; // This rounds up to nearest 10 minutes and adds 10, otherwise it would spam if the nearest ten minutes are now
   
-  if (minutes >= 50) {
+  if (minutes >= 50) { // This is here for the save to trigger at full hours
     nextWriteMinutes = 60;
   }
 
