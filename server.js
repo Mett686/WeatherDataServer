@@ -9,7 +9,7 @@ const PORT = 3000;
 const DIR = __dirname;
 var dataPath = DIR + '/data/';
 
-const decimal = { // This sets how many decimal places should be saved
+const decimal = { // This sets 
   temperature: 1,
     pressure: 0,
     humidity: 2,
@@ -17,6 +17,8 @@ const decimal = { // This sets how many decimal places should be saved
     windDirection: 0,
     radiation: 2 
 }
+
+const radiationK = 100;
 
 //-----spaghetti-beyond-------
 let logDataN = 0;
@@ -69,7 +71,9 @@ function dataWrite() {
   dataAverage.pressure = avg(dataSum.pressure).toFixed(decimal.pressure);
   dataAverage.humidity = avg(dataSum.humidity).toFixed(decimal.humidity);
   dataAverage.windSpeed = avg(dataSum.windSpeed).toFixed(decimal.windSpeed);
-  dataAverage.radiation = avg(dataSum.radiation).toFixed(decimal.radiation);
+  dataAverage.radiation = avg(dataSum.radiation).toFixed(decimal.radiation + 2);//Gut spaghetti
+
+  let radiation_nSv = dataAverage.radiation * radiationK;
   
   // This puts the windDirection back together
   dataAverage.windDirection.sin = avg(dataSum.windDirection.sin);
@@ -79,7 +83,7 @@ function dataWrite() {
   dataAverage.windDirection.degrees = (( degrees + 360 ) % 360).toFixed(decimal.windDirection);
   
   // Now the program tries to write the averages to a file
-  dataString = `${(new Date()).toISOString()},${dataAverage.temperature},${dataAverage.pressure},${dataAverage.humidity},${dataAverage.windSpeed},${dataAverage.windDirection.degrees},${dataAverage.radiation}\r\n`
+  dataString = `${(new Date()).toISOString()},${dataAverage.temperature},${dataAverage.pressure},${dataAverage.humidity},${dataAverage.windSpeed},${dataAverage.windDirection.degrees},${radiation_nSv}\r\n`
 
   try {
     fs.appendFileSync(dataPath + new Date().toISOString().slice(0, 4) + '.csv', dataString);

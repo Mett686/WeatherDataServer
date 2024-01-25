@@ -11,7 +11,11 @@
         
             let array; // Declare the variable outside the fetch block
 
-            fetch('http://knotkovi.tplinkdns.com:3000/array/2024/2025')
+            var weekAgo_ms = new Date() - 7 * 24 * 60 * 60 * 1000;
+            var weekAgoString = new Date(weekAgo_ms).toISOString();
+            console.log(weekAgoString);
+
+            fetch(`http://knotkovi.tplinkdns.com:3000/array/${weekAgoString}/${new Date()}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
