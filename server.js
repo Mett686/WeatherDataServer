@@ -11,7 +11,7 @@ var dataPath = DIR + '/data/';
 
 const decimal = { // This sets 
   temperature: 1,
-    pressure: 0,
+    pressure: 2,
     humidity: 2,
     windSpeed: 2,
     windDirection: 0,
@@ -68,7 +68,7 @@ function dataWrite() {
   }}
 
   dataAverage.temperature = avg(dataSum.temperature).toFixed(decimal.temperature);
-  dataAverage.pressure = avg(dataSum.pressure).toFixed(decimal.pressure);
+  dataAverage.pressure = (avg(dataSum.pressure)/1000).toFixed(decimal.pressure);
   dataAverage.humidity = avg(dataSum.humidity).toFixed(decimal.humidity);
   dataAverage.windSpeed = avg(dataSum.windSpeed).toFixed(decimal.windSpeed);
   dataAverage.radiation = avg(dataSum.radiation).toFixed(decimal.radiation + 2);//Gut spaghetti
