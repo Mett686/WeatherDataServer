@@ -1,61 +1,102 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>GZ-weatherAPI</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <link rel="stylesheet" href="" type="text/css"><script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-            google.charts.load('current', {'packages':['corechart']});
-            google.charts.setOnLoadCallback(drawChart);
-        
-            let array; // Declare the variable outside the fetch block
+<head>
+    <meta charset="UTF-8">
+    <title>GZ-weatherAPI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Include the Google Charts library -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
 
-            var weekAgo_ms = new Date() - 7 * 24 * 60 * 60 * 1000;
-            var weekAgoString = new Date(weekAgo_ms).toISOString();
-            console.log(weekAgoString);
+        // Declare few variables at higher scope
+        let array;
+        let data;
+        let chart;
+        let options;
 
-            fetch(`http://knotkovi.tplinkdns.com:3000/array/${weekAgoString}/${new Date()}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Handle the JSON data
-                    console.log(data);
-                    array = data; // Assign data to the array variable here
-                    drawChart(); // Call drawChart after fetching and processing the data
-                })
-                .catch(error => {
-                    // Handle errors
-                    console.error('There was a problem with the fetch operation:', error);
-                });
+        var weekAgo_ms = new Date() - 7 * 24 * 60 * 60 * 1000;
+        var weekAgoString = new Date(weekAgo_ms).toISOString();
 
-            // Move the drawChart function definition here or make sure it's defined before calling drawChart
-            function drawChart() {
-                var data = google.visualization.arrayToDataTable(array);
+        fetch(`http://knotkovi.tplinkdns.com:3000/array/${weekAgoString}/${new Date()}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(dataResponse => {
+                // Handle the JSON data
+                console.log(dataResponse);
+                array = dataResponse; // Assign data to the array variable here
+                drawChart(); // Call drawChart after fetching and processing the data
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('There was a problem with the fetch operation:', error);
+            });
 
-                var options = {
-                    title: 'Weather graph',
-                    curveType: 'function',
-                    legend: { position: 'bottom' }
-                };
+        // Move the drawChart function definition here or make sure it's defined before calling drawChart
+        function drawChart() {
+            data = google.visualization.arrayToDataTable(array);
 
-                var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            options = {
+                title: 'Weather graph',
+                curveType: 'normal',
+                legend: { position: 'bottom' }
+            };
+
+            chart = new google.visualization.LineChart(document.getElementById('chart'));
 
             chart.draw(data, options);
-}
-      </script>
-    </head>
-    <body>
-        <div id="root" ></div>
-        <p>Hello and welcome to GZ weather API</p>
+        }
 
-        <p>Try chenking out <a href="http://knotkovi.tplinkdns.com:3000/data">http://knotkovi.tplinkdns.com:3000/data</a> for current values.</p>
-        <p>Or try downloading for year <a href="http://knotkovi.tplinkdns.com:3000/data/2024.csv">2024</a>.</p>
-        <div id="curve_chart" style="width: 1200px; height: 600px"></div>
-    </body>
-  </html>
-  
+        // Function to update chart based on user selection
+        function updateChart(selectedColumns) {
+            // Create a view with only selected columns
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0].concat(selectedColumns));
+
+            // Draw the updated chart
+            chart.draw(view, options);
+        }
+
+        // Function to get selected columns
+        function getSelectedColumns() {
+            var selectedColumns = [];
+            if (document.getElementById('Temperature').checked) selectedColumns.push(1);
+            if (document.getElementById('Pressure').checked) selectedColumns.push(2);
+            if (document.getElementById('Humidity').checked) selectedColumns.push(3);
+            if (document.getElementById('WindSpeed').checked) selectedColumns.push(4);
+            if (document.getElementById('WindDirection').checked) selectedColumns.push(5);
+            if (document.getElementById('Radiation').checked) selectedColumns.push(6);
+            
+            if (selectedColumns.length === 0) {
+            selectedColumns = [1, 2, 3, 4, 5, 6];
+            }
+
+            return selectedColumns;
+        }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <p>Hello and welcome to GZ weather API</p>
+
+    <p>Try checking out <a href="http://knotkovi.tplinkdns.com:3000/data">http://knotkovi.tplinkdns.com:3000/data</a> for current values.</p>
+    <p>Or try downloading for the year <a href="http://knotkovi.tplinkdns.com:3000/data/2024.csv">2024</a>.</p>
+    <div id="chart" style="width: 90vw; height: 600px; margin: 0 auto;"></div>
+    <br>
+    <div style="text-align: center;">
+        <label><input type="checkbox" id="Temperature" onclick="updateChart(getSelectedColumns())"> Temperature</label>
+        <label><input type="checkbox" id="Pressure" onclick="updateChart(getSelectedColumns())"> Pressure</label>
+        <label><input type="checkbox" id="Humidity" onclick="updateChart(getSelectedColumns())"> Humidity</label>
+        <label><input type="checkbox" id="WindSpeed" onclick="updateChart(getSelectedColumns())"> Wind Speed</label>
+        <label><input type="checkbox" id="WindDirection" onclick="updateChart(getSelectedColumns())"> WindDirection</label>
+        <label><input type="checkbox" id="Radiation" onclick="updateChart(getSelectedColumns())"> Radiation</label>
+    </div>
+</body>
+</html>

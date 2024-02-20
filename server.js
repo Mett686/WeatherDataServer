@@ -5,11 +5,11 @@ const fs = require('fs');
 
 
 // Settings
-const PORT = 3000;
+const PORT = XXXX;//set this
 const DIR = __dirname;
 var dataPath = DIR + '/data/';
 
-const decimal = { // This sets 
+const decimal = { // This sets decimal places
   temperature: 1,
     pressure: 2,
     humidity: 2,
@@ -18,7 +18,7 @@ const decimal = { // This sets
     radiation: 2 
 }
 
-const radiationK = 100;
+const radiationK = 100; // Const for radiation conversion
 
 //-----spaghetti-beyond-------
 let logDataN = 0;
@@ -158,7 +158,6 @@ app.get('/array/:startTime/:stopTime', (req, res) => { //Technically useless now
   const stopTime = new Date(req.params.stopTime);
 
   const csvFile = `${startTime.toISOString().slice(0, 4)}.csv`;
-  console.log(`${new Date().toISOString()} Received array request`);
 
   try {
     const csv = fs.readFileSync( dataPath + csvFile , { encoding: 'utf8' });
