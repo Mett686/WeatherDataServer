@@ -18,10 +18,10 @@
         let chart;
         let options;
 
-        var weekAgo_ms = new Date() - 7 * 24 * 60 * 60 * 1000;
-        var weekAgoString = new Date(weekAgo_ms).toISOString();
+        var fromWhen = new Date() - 4 * 24 * 60 * 60 * 1000;
+        var fromWhenString = new Date(fromWhen).toISOString();
 
-        fetch(`http://knotkovi.tplinkdns.com:3000/array/${weekAgoString}/${new Date()}`)
+        fetch(`http://knotkovi.tplinkdns.com:3000/array/2024-03-11T07:00:00.000Z/2024-03-13T02:00:00.001Z`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -41,26 +41,19 @@
 
         // Move the drawChart function definition here or make sure it's defined before calling drawChart
         function drawChart() {
-            data = google.visualization.arrayToDataTable(array);
+            if (!data) {
+                data = google.visualization.arrayToDataTable(array);
+                options = {
+                    title: 'Weather graph',
+                    curveType: 'normal',
+                    legend: { position: 'bottom' }
+                };
+                chart = new google.visualization.LineChart(document.getElementById('chart'));
+            }
 
-            options = {
-                title: 'Weather graph',
-                curveType: 'normal',
-                legend: { position: 'bottom' }
-            };
-
-            chart = new google.visualization.LineChart(document.getElementById('chart'));
-
-            chart.draw(data, options);
-        }
-
-        // Function to update chart based on user selection
-        function updateChart(selectedColumns) {
-            // Create a view with only selected columns
             var view = new google.visualization.DataView(data);
-            view.setColumns([0].concat(selectedColumns));
+            view.setColumns([0].concat(getSelectedColumns()));
 
-            // Draw the updated chart
             chart.draw(view, options);
         }
 
@@ -91,12 +84,12 @@
     <div id="chart" style="width: 90vw; height: 600px; margin: 0 auto;"></div>
     <br>
     <div style="text-align: center;">
-        <label><input type="checkbox" id="Temperature" onclick="updateChart(getSelectedColumns())"> Temperature</label>
-        <label><input type="checkbox" id="Pressure" onclick="updateChart(getSelectedColumns())"> Pressure</label>
-        <label><input type="checkbox" id="Humidity" onclick="updateChart(getSelectedColumns())"> Humidity</label>
-        <label><input type="checkbox" id="WindSpeed" onclick="updateChart(getSelectedColumns())"> Wind Speed</label>
-        <label><input type="checkbox" id="WindDirection" onclick="updateChart(getSelectedColumns())"> WindDirection</label>
-        <label><input type="checkbox" id="Radiation" onclick="updateChart(getSelectedColumns())"> Radiation</label>
+        <label><input type="checkbox" checked id="Temperature" onclick="drawChart()"> Temperature</label>
+        <label><input type="checkbox" checked id="Pressure" onclick="drawChart()"> Pressure</label>
+        <label><input type="checkbox" checked id="Humidity" onclick="drawChart()"> Humidity</label>
+        <label><input type="checkbox" checked id="WindSpeed" onclick="drawChart()"> Wind Speed</label>
+        <label><input type="checkbox" checked id="WindDirection" onclick="drawChart()"> WindDirection</label>
+        <label><input type="checkbox" checked id="Radiation" onclick="drawChart()"> Radiation</label>
     </div>
 </body>
 </html>
