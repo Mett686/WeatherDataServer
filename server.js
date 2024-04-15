@@ -71,19 +71,24 @@ function dataWrite() {
   dataAverage.pressure = (avg(dataSum.pressure)/1000).toFixed(decimal.pressure);
   dataAverage.humidity = avg(dataSum.humidity).toFixed(decimal.humidity);
   dataAverage.windSpeed = avg(dataSum.windSpeed).toFixed(decimal.windSpeed);
-  dataAverage.radiation = avg(dataSum.radiation).toFixed(decimal.radiation + 2);//Gut spaghetti
-
-  let radiation_nSv = dataAverage.radiation * radiationK;
+  dataAverage.radiation = avg(dataSum.radiation).toFixed(decimal.radiation + 2) * radiationK;//Gut spaghetti
   
   // This puts the windDirection back together
   dataAverage.windDirection.sin = avg(dataSum.windDirection.sin);
   dataAverage.windDirection.cos = avg(dataSum.windDirection.cos);
 
   const degrees = Math.atan2(dataAverage.windDirection.sin, dataAverage.windDirection.cos) * (180 / Math.PI);
-  dataAverage.windDirection.degrees = (( degrees + 360 ) % 360).toFixed(decimal.windDirection);
+  dataAverage.windDirection = (( degrees + 360 ) % 360).toFixed(decimal.windDirection);
   
+  //Turn NaN if not receiving data to null for the  graph puposes
+  for (let key in dataAverage) {
+    if(isNaN(dataAverage[key])) {
+      dataAverage[key] = null;
+    }
+  }
+
   // Now the program tries to write the averages to a file
-  dataString = `${(new Date()).toISOString()},${dataAverage.temperature},${dataAverage.pressure},${dataAverage.humidity},${dataAverage.windSpeed},${dataAverage.windDirection.degrees},${radiation_nSv}\r\n`
+  dataString = `${(new Date()).toISOString()},${dataAverage.temperature},${dataAverage.pressure},${dataAverage.humidity},${dataAverage.windSpeed},${dataAverage.windDirection},${dataAverage.radiation}\r\n`
 
   try {
     fs.appendFileSync(dataPath + new Date().toISOString().slice(0, 4) + '.csv', dataString);
