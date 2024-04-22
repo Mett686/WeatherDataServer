@@ -167,9 +167,7 @@ app.get('/array/:startTime/:stopTime', (req, res) => { //Technically useless now
   try {
     const csv = fs.readFileSync( dataPath + csvFile , { encoding: 'utf8' });
 
-    const csvArray = csv.split(`\r\n`); // Split the CSV string into an array of lines
-
-    const filteredCsvArray = csvArray
+    const filteredCsvArray = csv.split(`\r\n`)
       .filter((line, index) => {
         if (index === 0) {
           // Include the header row in the result
